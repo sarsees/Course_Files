@@ -46,10 +46,10 @@ def get_sar_estimate(area, equations, parameters):
     return sum(estimates) / len(estimates)
 
 sar_eqs = [power_eq, power_quad_eq, logarithmic_eq, michaelis_menten_eq, lomolino]
-sar_parameters = [[22.7, 0.3], [1.2, 0.163, 0.0],
+sar_params = [[22.7, 0.3], [1.2, 0.163, 0.0],
                   [14.36, 21.16], [85.91, 42.57],
                   [1082.45, 1.59, 390000000]]
 
 if __name__ == "__main__":
     for area in fileinput.input():
-        print area.strip() + ',' + str(get_sar_estimate(float(area), sar_eqs, sar_parameters))
+        print area.strip() + ',' + str(get_sar_estimate(float(area), sar_eqs, sar_params))
