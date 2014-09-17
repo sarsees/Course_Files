@@ -23,18 +23,20 @@ print "Extant Mammals:",ExtantCount
 print "Extinct Mammals:",ExtinctCount
 
 #Find out how many genera are present in the dataset
-genera = []
-for mammal in MammalData.values:
-    genera.append(mammal[4])
-print "Unique Genera:",len(np.unique(genera))
+print "Unique Genera:",len(np.unique(MammalData['Genus']))
 
 #Print the names and mass of the largest and smallest species 
-size = []
-for mammal in MammalData.values:
-    if mammal[7] >= 0:
-        size.append(mammal[7])
-    else:
-        size.append(0)
+def size_no_negative(data):
+    size = []
+    for mammal in data:
+        if mammal[7] >= 0:
+            size.append(mammal[7])
+        else:
+            size.append(0)
+            return(size)
+
+size = size_no_negative(MammalData.values)
+
 LargestMammal = MammalData.values[size.index(max(size))]  
 SmallestMammal = MammalData.values[size.index(min(size))]  
 print "Largest Mammal:",LargestMammal[3:6]
