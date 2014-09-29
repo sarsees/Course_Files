@@ -27,19 +27,22 @@ def calculate_Euclidean_distance(SpeciesSiteA, SpeciesSiteB):
 def get_data_from_web(url):
     data = pd.read_csv(url)
     return data
-BirdData = get_data_from_web('http://www.esapubs.org/archive/ecol/E091/124/TGPP_cover.csv')
+
 
 #Create a dict for each site by species name and cover
-#Sort by Site and Species first
-groupedBirdData = BirdData.groupby(['plot','spcode'])    
-SiteDictOfCoverDict = dict()   
-SumGroupBirdData = groupedBirdData.sum()
-for site in SumGroupBirdData.index.levels[0]:#get a list of indices from group
-    SiteDictOfCoverDict[site] = dict(SumGroupBirdData.loc[site]['cover'])
+def create_sorted_dicts(data):
+    groupedData = data.groupby(['plot','spcode'])    
+    DictOfDicts = dict()   
+    SumGroupData = groupedData.sum()
+    for site in SumGroupData.index.levels[0]:#get a list of indices from group
+        DictOfDicts[site] = dict(SumGroupData.loc[site]['cover'])
+    return DictOfDicts
     
-#Combinations of Plots
-results = []
+#Execute Plan
+BirdData = get_data_from_web('http://www.esapubs.org/archive/ecol/E091/124/TGPP_cover.csv')
+SiteDictOfCoverDict = create_sorted_dicts(BirdData)
 CombinationsOfDicts = combinations(SiteDictOfCoverDict.keys(),2)
+results = []
 for plot1, plot2 in CombinationsOfDicts:
     results.append([plot1, plot2, 1-(calculate_Euclidean_distance(SiteDictOfCoverDict[plot1],SiteDictOfCoverDict[plot2]))])
 #Write results
