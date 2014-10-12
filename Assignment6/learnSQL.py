@@ -14,10 +14,11 @@ con.commit()
 # Adding another set of new field values-- sqlite3.OperationalError: near "t": syntax error
 cur.execute("""INSERT INTO FieldNotes (Day, Month, Year, Notes) 
                       VALUES (01, 10, 2013, 'Vegetation seems to have returned to normal for this time of year. 
-                      The landscape isn't exactly green, but there is a decent amount of plant activity and there 
+                      The landscape isn``t exactly green, but there is a decent amount of plant activity and there 
                       should be enough food for the rodents to the winter')""")
 con.commit()
 
 #Update a mistaken value
 cur.execute("UPDATE FieldNotes SET Year = '2012' WHERE Day = 1 AND Month = 10 AND Year = 2013")
 con.commit()
+
