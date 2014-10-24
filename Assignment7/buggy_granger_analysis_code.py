@@ -42,7 +42,7 @@ if '__name__' == "__main__":
     for indiv_id, earlength, dna in elves_data:
         gc_content = get_gc_content(dna)
         earlength_size_class = get_size_class(earlength)
-        results.append((indiv_id, earlength_category, gc_content))
+        results.append((indiv_id, earlength_size_class, gc_content))
 
     #Get average values of gc content for each size class
     transposed_results = zip(*results)
