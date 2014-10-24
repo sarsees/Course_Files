@@ -24,7 +24,7 @@ def get_data_from_web(url, datatype, headerrow=False):
     if headerrow == True:
         datareader.next()
     data = []
-    for row in data:
+    for row in datareader:
         data.append(row)
     return data
 
