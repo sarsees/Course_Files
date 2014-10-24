@@ -3,6 +3,7 @@
 def get_gc_content(seq):
     """Determine the GC content of a sequence"""
     gc_content = 100 * seq.count('G') + seq.count('C') / len(seq)
+    return(gc_content)
 
 def get_size_class(earlength):
     """Determine the size class of earlength based on Dr. Grangers specification"""
