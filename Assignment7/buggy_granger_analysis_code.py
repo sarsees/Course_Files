@@ -2,7 +2,8 @@
 
 def get_gc_content(seq):
     """Determine the GC content of a sequence"""
-    gc_content = 100 * (seq.count('G') + seq.count('C')+seq.count('g')+seq.count('c')) / len(seq)
+    cleanseq = seq.replace('\n','').replace(' ','')
+    gc_content = 100 * (cleanseq.count('G') + cleanseq.count('C')+cleanseq.count('g')+cleanseq.count('c')) / len(cleanseq)
     return(gc_content)
 
 def get_size_class(earlength):
