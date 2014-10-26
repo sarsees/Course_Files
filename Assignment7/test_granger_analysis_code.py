@@ -13,3 +13,25 @@ def TestGC_ContentMultilineString():
     multilinestring = """GGCC
     AAAA"""
     assert get_gc_content(multilinestring) == 50
+    
+def TestEarSizeInXLRange():
+    assert get_size_class(20) == 'extralarge'
+
+def TestEarSizeInLRange():
+    assert get_size_class(14) == 'large'
+    
+def TestEarSizeInMRange():
+    assert get_size_class(9) == 'medium'
+    
+def TestEarSizeInSRange():
+    assert get_size_class(2) == 'small'
+    
+def TestEarSizeOnXLBoundary():
+    assert get_size_class(15) == 'extralarge'
+
+def TestEarSizeOnLBoundary():
+    assert get_size_class(10) == 'large'
+    
+def TestEarSizeOnMBoundary():
+    assert get_size_class(8) == 'medium'
+    
