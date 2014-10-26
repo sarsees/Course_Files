@@ -8,15 +8,15 @@ def get_gc_content(seq):
 
 def get_size_class(earlength):
     """Determine the size class of earlength based on Dr. Grangers specification"""
-    if earlength > 15:
+    if earlength >= 15:
         size_class = 'extralarge'
-    elif earlength > 10:
+    elif (earlength >= 10) and (earlength < 15):
         size_class = 'large'
-    if earlength < 8:
+    elif (earlength >= 8) and (earlength < 10):
         size_class = 'medium'
     else:
         size_class = 'small'
-    return earlength
+    return size_class
 
 def get_data_from_web(url, datatype, headerrow=False):
     """Retrieve CSV data from the web and store it in a list of lists"""
