@@ -1,3 +1,4 @@
+import nose
 from buggy_granger_analysis_code import *
 
 def TestGC_ContentUpperCaseString():
@@ -34,4 +35,7 @@ def TestEarSizeOnLBoundary():
     
 def TestEarSizeOnMBoundary():
     assert get_size_class(8) == 'medium'
+    
+def TestEarSizeString():
+     nose.tools.assert_raises(AssertionError, get_size_class, 'bob')
     
