@@ -8,6 +8,7 @@ def get_gc_content(seq):
 
 def get_size_class(earlength):
     """Determine the size class of earlength based on Dr. Grangers specification"""
+    assert type(earlength) == int or type(earlength) == float
     if earlength >= 15:
         size_class = 'extralarge'
     elif (earlength >= 10) and (earlength < 15):
