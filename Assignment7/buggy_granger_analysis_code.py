@@ -1,5 +1,5 @@
 """Analysis code for Dr. Granger's project"""
-
+from __future__ import division
 def get_gc_content(seq):
     """Determine the GC content of a sequence"""
     cleanseq = seq.replace('\n','').replace(' ','')
