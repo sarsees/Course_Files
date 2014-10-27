@@ -107,6 +107,7 @@ ExtinctSAMammals = SAMammals[SAMammals['Status'] == 'extinct']
 ExtantSAMammals = SAMammals[SAMammals['Status'] == 'extant']
 #plot the data
 import matplotlib.pyplot as plt
+
 #AF
 fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(8, 6.5))
 plt.suptitle('AF Mammals',fontsize=20)
