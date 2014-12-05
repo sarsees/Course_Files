@@ -58,40 +58,44 @@ def f(x,dilution):
     
     #calculate response(pixel intensity) for these parameters
     return ( np.array (x[0] + (x[1] - x[0])/( (1 + abs((dup_dilution/x[3])**x[2]) )**x[4] ) ) ) 
-
-def alternate(i):
-    i = iter(i)
-    while True:
-        yield(i.next(), i.next())
         
+def establish_predicted_values(working_data):
+    #First column of any data is dilution scheme
+    dilution = np.array(working_data[0]) 
+    #Following columns are organized into replicates
+    
+    def alternate(i):
+        i = iter(i)
+        while True:
+            yield(i.next(), i.next())   
+            
+    columns = range(1,len(working_data))
+    col_pairs = list(alternate(columns)) 
+    backfit_results_table = []
+    for pairs in col_pairs:    
+        rep1 = np.array(working_data[pairs[0]])
+        rep2 = np.array(working_data[pairs[1]])
+        #Optimization
+        xopt = scipy.optimize.fmin(func = wSSE, 
+                                   x0 = [18.0, 65000.0, -10.0, 5.0, 0.75],
+                                   args = ((rep1,rep2,dilution)),
+                                   maxiter=1*10**6, 
+                                   maxfun=1*10**6)
+        predicted_vals = np.array(f(xopt, dilution))
+        backfit = np.hstack((rep1,rep2))/predicted_vals
+        backfit_results_table.append(backfit)
+    return(backfit_results_table)
+    
 #Get workable data
 wb_template = load_workbook('Data_for_Sarah.xlsx', data_only=True)
 data = wb_template[ "Signal" ]
-working_data = extract_data(data)
+usable_data = extract_data(data)
+#Get fitted results
+Analyte1_results = establish_predicted_values(usable_data)
 
-#First column of any data is dilution scheme
-dilution = np.array(working_data[0]) 
-#Following columns are organized into replicates
-columns = range(1,len(working_data))
-col_pairs = list(alternate(columns)) 
-backfit_results_table = []
-
-for pairs in col_pairs:    
-    rep1 = np.array(working_data[pairs[0]])
-    rep2 = np.array(working_data[pairs[1]])
-    #Optimization
-    xopt = scipy.optimize.fmin(func = wSSE, 
-                               x0 = [18.0, 65000.0, -10.0, 5.0, 0.75],
-                               args = ((rep1,rep2,dilution)),
-                               maxiter=1*10**6, 
-                               maxfun=1*10**6)
-    predicted_vals = np.array(f(xopt, dilution))
-    backfit = np.hstack((rep1,rep2))/predicted_vals
-    backfit_results_table.append(backfit)
-    
-plt.plot( [np.log(dilution)], [rep1],'bo')
-plt.plot( [np.log(dilution)],[f(xopt,dilution)],'ro')
-plt.show()
+#plt.plot( [np.log(dilution)], [rep1],'bo')
+#plt.plot( [np.log(dilution)],[f(xopt,dilution)],'ro')
+#plt.show()
 
 
      
