@@ -4,27 +4,29 @@ import numpy as np
 import matplotlib.pyplot as plt
 #Read me: describe the problem and anything you need to run the code
 #Conclusion of nested loop
-def excel_col(col):
-    """col is a column number returns letter. 1=A """
-    quot, rem = divmod(col-1,26)
-    return excel_col(quot) + chr(rem+ord('A')) if col!=0 else ''
 
 
-
-for column in range(2,38):
-    data_range_start.append(str(excel_col(column))+'17')
-    data_range_end.append(str(excel_col(column))+'24')
-
-wb_template = load_workbook('Data_for_Sarah.xlsx', data_only=True)
-data = wb_template[ "Signal" ]
-for i, start_pos in enumerate(data_range_start):
-    end_pos = data_range_end[i]
-    cell_range = data[start_pos:end_pos]
-    col_results = [n[0].value for n in cell_range]
-    usable_data.append(col_results)
+def extract_data(data):
+    data_range_start = []
+    data_range_end = []
+    usable_data = []
     
-#Optimization
-#calculate the error
+    def excel_col(col):
+        """col is a column number returns letter. 1=A """
+        quot, rem = divmod(col-1,26)
+        return excel_col(quot) + chr(rem+ord('A')) if col!=0 else ''    
+
+    for column in range(2,38):
+        data_range_start.append(str(excel_col(column))+'17')
+        data_range_end.append(str(excel_col(column))+'24')
+    
+    for i, start_pos in enumerate(data_range_start):
+        end_pos = data_range_end[i]
+        cell_range = data[start_pos:end_pos]
+        col_results = [n[0].value for n in cell_range]
+        usable_data.append(col_results)
+    return(usable_data)
+
 def wSSE(x, rep1, rep2, dilution): 
     """wSSE is a function that returns a weighted sum of squares error
     value for optimization with fmin.
@@ -62,14 +64,18 @@ def alternate(i):
     while True:
         yield(i.next(), i.next())
         
+#Get workable data
+wb_template = load_workbook('Data_for_Sarah.xlsx', data_only=True)
+data = wb_template[ "Signal" ]
+working_data = extract_data(data)
 #First column of any data is dilution scheme
-dilution = np.array(usable_data[0]) 
+dilution = np.array(working_data[0]) 
 #Following columns are organized into replicates
-columns = range(1,len(usable_data))
+columns = range(1,len(working_data))
 col_pairs = list(alternate(columns))    
 for pairs in col_pairs:    
-    rep1 = np.array(usable_data[pairs[0]])
-    rep2 = np.array(usable_data[pairs[1]])
+    rep1 = np.array(working_data[pairs[0]])
+    rep2 = np.array(working_data[pairs[1]])
     #Optimization
     xopt = scipy.optimize.fmin(func = wSSE, 
                                x0 = [18.0, 65000.0, -10.0, 5.0, 0.75],
