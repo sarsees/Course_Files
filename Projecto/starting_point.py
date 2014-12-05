@@ -68,11 +68,14 @@ def alternate(i):
 wb_template = load_workbook('Data_for_Sarah.xlsx', data_only=True)
 data = wb_template[ "Signal" ]
 working_data = extract_data(data)
+
 #First column of any data is dilution scheme
 dilution = np.array(working_data[0]) 
 #Following columns are organized into replicates
 columns = range(1,len(working_data))
-col_pairs = list(alternate(columns))    
+col_pairs = list(alternate(columns)) 
+backfit_results_table = []
+
 for pairs in col_pairs:    
     rep1 = np.array(working_data[pairs[0]])
     rep2 = np.array(working_data[pairs[1]])
@@ -84,7 +87,8 @@ for pairs in col_pairs:
                                maxfun=1*10**6)
     predicted_vals = np.array(f(xopt, dilution))
     backfit = np.hstack((rep1,rep2))/predicted_vals
-
+    backfit_results_table.append(backfit)
+    
 plt.plot( [np.log(dilution)], [rep1],'bo')
 plt.plot( [np.log(dilution)],[f(xopt,dilution)],'ro')
 plt.show()
