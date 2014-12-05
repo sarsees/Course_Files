@@ -10,10 +10,8 @@ def excel_col(col):
     return excel_col(quot) + chr(rem+ord('A')) if col!=0 else ''
 
 
-data_range_start = []
-data_range_end = []
-usable_data = []
-for column in range(2,40):
+
+for column in range(2,38):
     data_range_start.append(str(excel_col(column))+'17')
     data_range_end.append(str(excel_col(column))+'24')
 
@@ -59,15 +57,27 @@ def f(x,dilution):
     #calculate response(pixel intensity) for these parameters
     return ( np.array (x[0] + (x[1] - x[0])/( (1 + abs((dup_dilution/x[3])**x[2]) )**x[4] ) ) ) 
 
-
-rep1 = np.array(usable_data[3])
-rep2 = np.array(usable_data[4])
+def alternate(i):
+    i = iter(i)
+    while True:
+        yield(i.next(), i.next())
+        
+#First column of any data is dilution scheme
 dilution = np.array(usable_data[0]) 
-xopt = scipy.optimize.fmin(func = wSSE, 
-                           x0 = [18.0, 65000.0, -10.0, 5.0, 0.75],
-                           args = ((rep1,rep2,dilution)),
-                           maxiter=1*10**6, 
-                           maxfun=1*10**6)
+#Following columns are organized into replicates
+columns = range(1,len(usable_data))
+col_pairs = list(alternate(columns))    
+for pairs in col_pairs:    
+    rep1 = np.array(usable_data[pairs[0]])
+    rep2 = np.array(usable_data[pairs[1]])
+    #Optimization
+    xopt = scipy.optimize.fmin(func = wSSE, 
+                               x0 = [18.0, 65000.0, -10.0, 5.0, 0.75],
+                               args = ((rep1,rep2,dilution)),
+                               maxiter=1*10**6, 
+                               maxfun=1*10**6)
+    predicted_vals = np.array(f(xopt, dilution))
+    backfit = np.hstack((rep1,rep2))/predicted_vals
 
 plt.plot( [np.log(dilution)], [rep1],'bo')
 plt.plot( [np.log(dilution)],[f(xopt,dilution)],'ro')
