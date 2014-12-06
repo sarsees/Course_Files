@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 #Conclusion of nested loop
 
 
-def extract_data(data):
+def extract_data(data,start_row,end_row,start_col,end_col):
     data_range_start = []
     data_range_end = []
     usable_data = []
@@ -16,9 +16,9 @@ def extract_data(data):
         quot, rem = divmod(col-1,26)
         return excel_col(quot) + chr(rem+ord('A')) if col!=0 else ''    
 
-    for column in range(2,38):
-        data_range_start.append(str(excel_col(column))+'17')
-        data_range_end.append(str(excel_col(column))+'24')
+    for column in range(start_col,end_col):
+        data_range_start.append(str(excel_col(column))+start_row)
+        data_range_end.append(str(excel_col(column))+end_row)
     
     for i, start_pos in enumerate(data_range_start):
         end_pos = data_range_end[i]
@@ -88,14 +88,14 @@ def establish_predicted_values(working_data):
     
 #Get workable data
 wb_template = load_workbook('Data_for_Sarah.xlsx', data_only=True)
-data = wb_template[ "Signal" ]
-usable_data = extract_data(data)
-#Get fitted results
-Analyte1_results = establish_predicted_values(usable_data)
-
+data = wb_template[ "Signal" ] 
+row_start_stop = [(str(17+20*nums),str(24+20*nums))  for nums in range(0,7)]
+Results = []
+for starts,ends in row_start_stop:
+    usable_data = extract_data(data,starts,ends,4,35)
+    Analyte_results = establish_predicted_values(usable_data)
+    Results.append(Analyte_results)
 #plt.plot( [np.log(dilution)], [rep1],'bo')
 #plt.plot( [np.log(dilution)],[f(xopt,dilution)],'ro')
 #plt.show()
-
-
-     
+    
