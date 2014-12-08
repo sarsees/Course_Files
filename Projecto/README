@@ -7,5 +7,6 @@ py to:
 3. Evaluate the model at these guesses and calculate the error
 4. Minimize the error
 5. Record the quality of fit with the "backfit" value obs/pred
-Results: Stored in "Backfitting_Results.txt", a file containing each series of backfit values according to the analyte and replicate it came from
+Results: Stored in "Backfitting_Results.txt", a file containing each series of backfit values according to the analyte and replicate it came from.
+Next steps are to begin implementing Bayesian priors into fitting methods. Now I have the Python power!
 
