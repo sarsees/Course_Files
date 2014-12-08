@@ -42,6 +42,28 @@ def wSSE(x, rep1, rep2, dilution):
     err = sum(constant*weights*( f(x,dilution) - replicates)**2 );  
     return(err)
 
+def wMPLE(x, rep1, rep2, dilution):   
+    """wSSE is a function that returns a weighted Maximum Posterior Likelihood error
+    value for optimization with fmin.
+    Inputs:
+    x, a vector of parameters to estimate the model 5 parameter logistic curve f(x,dilution)
+    rep1, a vector of observed pixel intensities- first replicate
+    rep2, a vector of observed pixel intensities- second replicate
+    dilution: column of serial dilutions (first column of analyte data)
+    """
+    replicates = np.hstack((rep1,rep2))    
+    weights = np.hstack( ((rep1-rep2)**2,(rep1-rep2)**2) )
+    constant = 1/sum(weights);    
+    nobs = 2*len(rep1);
+    err = (nobs/2*np.log(2*np.pi*x[5]**2)
+           + nobs*sum(constant*weights*(f(x,dilution) - replicates)**2)/(2*x[5]**2)
+           + 0.5*np.log(2*np.pi*x[6]^2)+(x[0]-x[11])**2/(2*x[6]**2)
+           + 0.5*np.log(2*np.pi*x[7]^2)+(x[1]-x[12])**2/(2*x[7]**2)
+           + 0.5*np.log(2*np.pi*x[8]**2)+(x[3]-x[14])**2/(2*x[8]**2)
+           + 0.5*np.log(2*np.pi*x[10]**2)+(x[4]-x[15])**2/(2*x[10]**2)
+           + 0.5*np.log(2*np.pi*x[9]**2)+(x[2]-x[13])**2/(2*x[9]**2))
+    return(err)
+    
 def f(x,dilution):
     """f is function that evaluates a 5 parameter logistic curve at
     the log of given, replicate, serial dilutions
@@ -51,7 +73,7 @@ def f(x,dilution):
     x[2], the slope factor
     x[3], the mid-range concentration
     x[4], asymmetry factor
-    dilution: column of serial dilutions (first column of analyte data)"""
+    dilution, column of serial dilutions (first column of analyte data)"""
     #Make columns for two replicates for simultaneous fitting
     temp_dilution = np.log(dilution)
     dup_dilution = np.hstack((temp_dilution,temp_dilution))
@@ -59,12 +81,20 @@ def f(x,dilution):
     #calculate response(pixel intensity) for these parameters
     return ( np.array (x[0] + (x[1] - x[0])/( (1 + abs((dup_dilution/x[3])**x[2]) )**x[4] ) ) ) 
         
-def establish_predicted_values(working_data):
+def predict_values(working_data,method, initial_guess):
+    """predict_values is a function that fits a curve to data, minimizing the error
+    function specified.
+    Inputs:
+    working_data, one column of serial dilutions preceding n columns of replicate data
+    method, the error function to minimize
+    initial_guess, vector of 5 starting parameter values [d, a, b, c, g]
+    Output:
+    backfit_results_table, a table of predicted/observed ratios for each data point"""
     #First column of any data is dilution scheme
     dilution = np.array(working_data[0]) 
     #Following columns are organized into replicates
-    
     def alternate(i):
+        """Pairs columns into corresponding replicates"""
         i = iter(i)
         while True:
             yield(i.next(), i.next())   
@@ -76,8 +106,8 @@ def establish_predicted_values(working_data):
         rep1 = np.array(working_data[pairs[0]])
         rep2 = np.array(working_data[pairs[1]])
         #Optimization
-        xopt = scipy.optimize.fmin(func = wSSE, 
-                                   x0 = [18.0, 65000.0, -10.0, 5.0, 0.75],
+        xopt = scipy.optimize.fmin(func = method, 
+                                   x0 = initial_guess,
                                    args = ((rep1,rep2,dilution)),
                                    maxiter=1*10**6, 
                                    maxfun=1*10**6)
@@ -90,11 +120,15 @@ def establish_predicted_values(working_data):
 wb_template = load_workbook('Data_for_Sarah.xlsx', data_only=True)
 data = wb_template[ "Signal" ] 
 row_start_stop = [(str(17+20*nums),str(24+20*nums))  for nums in range(0,7)]
-Results = []
+wSSE_Results = {}
+wMPLE_Results = []
+
 for starts,ends in row_start_stop:
     usable_data = extract_data(data,starts,ends,4,35)
-    Analyte_results = establish_predicted_values(usable_data)
-    Results.append(Analyte_results)
+    analyte_results = predict_values(usable_data,wSSE,[18.0, 65000.0, -10.0, 5.0, 0.75])
+    wSSE_Results.update({starts:(analyte_results)})
+        #wMPLE_Results.append(predict_values(usable_data,wMPLE,[18.0, 65000.0, -10.0, 5.0, 0.75]))
+    
 #plt.plot( [np.log(dilution)], [rep1],'bo')
 #plt.plot( [np.log(dilution)],[f(xopt,dilution)],'ro')
 #plt.show()
