@@ -1,0 +1,12 @@
+Problem: We have assay data from a series of analytes. We want to fit a model to
+ each replicate of data, then measure how well the model fits.
+Approach: 
+1. Read in the data from a .xlsx file "Data_for_Sarah" and use weighted_fitting.
+py to:
+2. Take a starting guess at parameter values for the model
+3. Evaluate the model at these guesses and calculate the error
+4. Minimize the error
+5. Record the quality of fit with the "backfit" value obs/pred
+Results: Stored in "Backfitting_Results.txt", a file containing each series of backfit values according to the analyte and replicate it came from.
+Next steps are to begin implementing Bayesian priors into fitting methods. Now I have the Python power!
+
